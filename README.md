@@ -16,9 +16,13 @@ Applied by writing `_elementor_data` through the REST API (`tools/wp/update_form
 
 Before/after copies of each page's Elementor data are in `backups/elementor-forms/`.
 
-## Still to do
-1. **Cloudflare Turnstile** (invisible bot check). Elementor Pro 4.2.3 has no native Turnstile field, so install the free plugin *Simple Cloudflare Turnstile*, enter a Site Key + Secret Key from a free Cloudflare account (Turnstile → Add widget, hostname `rsraingutters.com`, mode Managed), and enable it for Elementor Forms.
-2. Optional: enable Wordfence rate limiting for POSTs to `/wp-admin/admin-ajax.php`; close comments sitewide if unused.
+## Cloudflare Turnstile (done 2026-09-10)
+Elementor Pro 4.2.3 has no native Turnstile field, so the free plugin *Simple Cloudflare Turnstile* (v1.43) is installed with a Managed-mode widget for `rsraingutters.com`. Settings → Cloudflare Turnstile → Elementor Forms is enabled (widget before button, scripts on all pages). The widget is injected client-side by the plugin's `elementor-forms.js`; submissions are validated server-side via the `elementor_pro/forms/validation` hook, so a request without a valid token is rejected.
+
+## Optional follow-ups
+- Wordfence rate limiting for POSTs to `/wp-admin/admin-ajax.php`.
+- Close comments sitewide if unused (`/wp-json/wp/v2/comments` is publicly readable).
+- Divi → Theme Options still holds an unused Google reCAPTCHA key; disabling it stops an unneeded Google script from loading.
 
 ## Notes
 - Saving a page from the classic WordPress editor or the Divi builder clears Elementor's `_elementor_edit_mode` flag and the page falls back to old Divi content. Always save these pages from the Elementor editor. `tools/wp/restore_flag.py` restores the flag if it happens again.
