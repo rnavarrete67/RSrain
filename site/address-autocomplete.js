@@ -15,7 +15,7 @@
  */
 (function () {
   var GOOGLE_KEY = 'PASTE_YOUR_GOOGLE_API_KEY_HERE';
-  var BIAS = { center: { lat: 43.60, lng: -116.39 }, radius: 80000 }; // Treasure Valley, 80 km
+  var BIAS = { center: { lat: 43.60, lng: -116.39 }, radius: 50000 }; // Treasure Valley, 50 km (Google max)
   var SEL = {
     address: 'input[name="form_fields[address]"]',
     city: 'input[name="form_fields[city]"]',
