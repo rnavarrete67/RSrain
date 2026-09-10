@@ -34,6 +34,7 @@
 
   /* ---------- 2. Google Places suggestions ---------- */
   var loading = null;
+  function report(where) { return function (err) { if (window.console) console.error('[address-autocomplete] ' + where + ':', err); }; }
   function loadGoogle() {
     if (loading) return loading;
     loading = new Promise(function (resolve, reject) {
@@ -121,7 +122,7 @@
         token = null; // a selection ends the billing session
         var next = zipInput && !zipInput.value ? zipInput : (cityInput && !cityInput.value ? cityInput : null);
         if (next) next.focus();
-      }).catch(function () { /* leave whatever the visitor typed */ });
+      }).catch(report('place details'));
     }
     function search(q) {
       if (!token) token = new google.maps.places.AutocompleteSessionToken();
@@ -131,15 +132,15 @@
       }).then(function (res) {
         if (q !== lastQuery) return; // a newer keystroke won
         render((res && res.suggestions) || []);
-      }).catch(close);
+      }).catch(function (err) { close(); report('suggestions')(err); });
     }
 
-    addressInput.addEventListener('focus', function () { loadGoogle().catch(function () {}); });
+    addressInput.addEventListener('focus', function () { loadGoogle().catch(report('loading Google')); });
     addressInput.addEventListener('input', function () {
       var q = addressInput.value.trim(); lastQuery = q;
       clearTimeout(timer);
       if (q.length < 3) return close();
-      timer = setTimeout(function () { loadGoogle().then(function () { search(q); }).catch(close); }, 250);
+      timer = setTimeout(function () { loadGoogle().then(function () { search(q); }).catch(function (err) { close(); report('loading Google')(err); }); }, 250);
     });
     addressInput.addEventListener('keydown', function (e) {
       if (!box) return;
