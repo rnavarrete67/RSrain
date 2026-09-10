@@ -33,7 +33,7 @@
   });
 
   /* ---------- 2. Google Places suggestions ---------- */
-  var loading = null;
+  var loading = null, places = null;
   function report(where) { return function (err) { if (window.console) console.error('[address-autocomplete] ' + where + ':', err); }; }
   function loadGoogle() {
     if (loading) return loading;
@@ -43,7 +43,7 @@
       s.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(GOOGLE_KEY) + '&v=weekly&loading=async&libraries=places';
       s.async = true; s.onload = resolve; s.onerror = reject;
       document.head.appendChild(s);
-    }).then(function () { return google.maps.importLibrary('places'); });
+    }).then(function () { return google.maps.importLibrary('places'); }).then(function (lib) { places = lib; return lib; }, function (err) { loading = null; throw err; });
     return loading;
   }
 
@@ -70,7 +70,7 @@
     var form = addressInput.closest('form');
     var cityInput = form && form.querySelector(SEL.city);
     var zipInput = form && form.querySelector(SEL.zip);
-    var box = null, items = [], active = -1, token = null, timer = null, lastQuery = '';
+    var box = null, items = [], active = -1, timer = null, lastQuery = '';
 
     function close() { if (box) { box.remove(); box = null; } items = []; active = -1; }
     function position() {
@@ -119,17 +119,15 @@
         setValue(addressInput, line1);
         if (city) setValue(cityInput, city);
         if (zip) setValue(zipInput, zip);
-        token = null; // a selection ends the billing session
         var next = zipInput && !zipInput.value ? zipInput : (cityInput && !cityInput.value ? cityInput : null);
         if (next) next.focus();
       }).catch(report('place details'));
     }
     function search(q) {
-      if (!token) token = new google.maps.places.AutocompleteSessionToken();
-      google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-        input: q, sessionToken: token, includedRegionCodes: ['us'], locationBias: BIAS, language: 'en-US',
-        includedPrimaryTypes: ['street_address', 'premise', 'subpremise']
-      }).then(function (res) {
+      var lib = places || (window.google && google.maps && google.maps.places);
+      if (!lib || !lib.AutocompleteSuggestion) { report('suggestions')('Places library not available'); return; }
+      var req = { input: q, includedRegionCodes: ['us'], locationBias: BIAS, includedPrimaryTypes: ['street_address', 'premise', 'subpremise'] };
+      lib.AutocompleteSuggestion.fetchAutocompleteSuggestions(req).then(function (res) {
         if (q !== lastQuery) return; // a newer keystroke won
         render((res && res.suggestions) || []);
       }).catch(function (err) { close(); report('suggestions')(err); });
