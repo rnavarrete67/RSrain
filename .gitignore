@@ -1,0 +1,4 @@
+# never commit session cookies, nonces, or page dumps
+*.txt
+*.html
+jar*
