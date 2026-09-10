@@ -6,8 +6,10 @@
  * works exactly as before, so the existing fields, validation and Turnstile are
  * untouched. Google is only loaded the first time someone focuses an Address field.
  *
- * Install: Elementor > Custom Code > Add New. Location "</body> - End",
- * condition "Entire Site". Paste this whole file inside <script> ... </script>.
+ * Install: Elementor > Custom Code > Add New. Location "body end",
+ * condition "Entire Site". Wrap this file in an opening and closing script tag.
+ * (Never write the closing script tag literally anywhere in this file,
+ * including comments: the browser would end the script there.)
  * Replace GOOGLE_KEY with the API key (restricted to rsraingutters.com,
  * APIs: Maps JavaScript API + Places API (New)).
  */
