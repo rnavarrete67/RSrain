@@ -27,3 +27,12 @@ Elementor Pro 4.2.3 has no native Turnstile field, so the free plugin *Simple Cl
 ## Notes
 - Saving a page from the classic WordPress editor or the Divi builder clears Elementor's `_elementor_edit_mode` flag and the page falls back to old Divi content. Always save these pages from the Elementor editor. `tools/wp/restore_flag.py` restores the flag if it happens again.
 - `tools/wp/wpclient.py` expects a curl cookie jar (`jar-py.txt`) from a logged-in admin session; cookies and nonces are git-ignored.
+
+## Address autocomplete (`site/address-autocomplete.js`)
+Adds Google Places (New) suggestions to every form's Address field and fills City + ZIP on selection. Manual typing keeps working; nothing about the forms, validation or Turnstile changes. Also sets standard browser `autocomplete` hints on name/phone/email/address/city/zip.
+
+Setup:
+1. Google Cloud: enable **Maps JavaScript API** and **Places API (New)** on a project with billing; create an API key restricted to websites `rsraingutters.com/*` and `*.rsraingutters.com/*` and to those two APIs.
+2. Paste the key into `GOOGLE_KEY` in the script.
+3. Elementor → Custom Code → Add New: location `</body> - End`, condition Entire Site, wrap the file in `<script>…</script>`, Publish.
+4. Google loads only on first focus of an Address field. Results are biased to an 80 km circle around the Treasure Valley and restricted to the US.
